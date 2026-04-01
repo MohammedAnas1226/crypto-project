@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cryptography Toolkit</title>
+
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    background: #f4f4f4;
+}
+.box {
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 320px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px gray;
+}
+input {
+    margin: 5px;
+    padding: 8px;
+}
+button {
+    padding: 8px 15px;
+    margin: 5px;
+    cursor: pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🔐 Cryptography Toolkit</h1>
+
+<!-- Caesar Cipher -->
+<div class="box">
+<h2>Caesar Cipher</h2>
+<input type="text" id="cText" placeholder="Enter Text">
+<input type="number" id="cKey" placeholder="Key">
+<br>
+<button onclick="cEncrypt()">Encrypt</button>
+<button onclick="cDecrypt()">Decrypt</button>
+<p id="cResult"></p>
+</div>
+
+<!-- Rail Fence Cipher -->
+<div class="box">
+<h2>Rail Fence Cipher</h2>
+<input type="text" id="rText" placeholder="Enter Text">
+<input type="number" id="rKey" placeholder="Rails">
+<br>
+<button onclick="rEncrypt()">Encrypt</button>
+<button onclick="rDecrypt()">Decrypt</button>
+<p id="rResult"></p>
+</div>
+
+<!-- Diffie Hellman -->
+<div class="box">
+<h2>Diffie-Hellman</h2>
+<input type="number" id="p" placeholder="Prime (p)">
+<input type="number" id="g" placeholder="Base (g)">
+<input type="number" id="a" placeholder="Private A">
+<input type="number" id="b" placeholder="Private B">
+<br>
+<button onclick="dh()">Generate Key</button>
+<p id="dResult"></p>
+</div>
+
+<script>
+
+// ===== PRIME CHECK =====
+function isPrime(n) {
+    if (n <= 1) return false;
+    for (let i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i === 0) return false;
+    }
+    return true;
+}
+
+// ===== CAESAR =====
+function cEncrypt() {
+    let text = document.getElementById("cText").value.toUpperCase();
+    let key = parseInt(document.getElementById("cKey").value);
+    let res = "";
+
+    for (let i = 0; i < text.length; i++) {
+        let c = text.charCodeAt(i);
+        if (c >= 65 && c <= 90)
+            res += String.fromCharCode((c - 65 + key) % 26 + 65);
+    }
+    document.getElementById("cResult").innerText = res;
+}
+
+function cDecrypt() {
+    let text = document.getElementById("cText").value.toUpperCase();
+    let key = parseInt(document.getElementById("cKey").value);
+    let res = "";
+
+    for (let i = 0; i < text.length; i++) {
+        let c = text.charCodeAt(i);
+        if (c >= 65 && c <= 90)
+            res += String.fromCharCode((c - 65 - key + 26) % 26 + 65);
+    }
+    document.getElementById("cResult").innerText = res;
+}
+
+// ===== RAIL FENCE =====
+function rEncrypt() {
+    let text = document.getElementById("rText").value;
+    let key = parseInt(document.getElementById("rKey").value);
+
+    let rail = Array.from({length: key}, () => Array(text.length).fill('\n'));
+    let dirDown = false;
+    let row = 0, col = 0;
+
+    for (let i = 0; i < text.length; i++) {
+        if (row == 0 || row == key - 1) dirDown = !dirDown;
+
+        rail[row][col++] = text[i];
+        row += dirDown ? 1 : -1;
+    }
+
+    let result = "";
+    for (let i = 0; i < key; i++)
+        for (let j = 0; j < text.length; j++)
+            if (rail[i][j] != '\n') result += rail[i][j];
+
+    document.getElementById("rResult").innerText = result;
+}
+
+function rDecrypt() {
+    let cipher = document.getElementById("rText").value;
+    let key = parseInt(document.getElementById("rKey").value);
+
+    let rail = Array.from({length: key}, () => Array(cipher.length).fill('\n'));
+
+    let dirDown;
+    let row = 0, col = 0;
+
+    for (let i = 0; i < cipher.length; i++) {
+        if (row == 0) dirDown = true;
+        if (row == key - 1) dirDown = false;
+
+        rail[row][col++] = '*';
+        row += dirDown ? 1 : -1;
+    }
+
+    let index = 0;
+    for (let i = 0; i < key; i++) {
+        for (let j = 0; j < cipher.length; j++) {
+            if (rail[i][j] == '*' && index < cipher.length)
+                rail[i][j] = cipher[index++];
+        }
+    }
+
+    let result = "";
+    row = 0; col = 0;
+    for (let i = 0; i < cipher.length; i++) {
+        if (row == 0) dirDown = true;
+        if (row == key - 1) dirDown = false;
+
+        result += rail[row][col++];
+        row += dirDown ? 1 : -1;
+    }
+
+    document.getElementById("rResult").innerText = result;
+}
+
+// ===== DIFFIE HELLMAN =====
+function dh() {
+    let p = parseInt(document.getElementById("p").value);
+    let g = parseInt(document.getElementById("g").value);
+    let a = parseInt(document.getElementById("a").value);
+    let b = parseInt(document.getElementById("b").value);
+
+    if (!isPrime(p)) {
+        alert("Error: p must be a prime number!");
+        return;
+    }
+
+    let A = (g ** a) % p;
+    let B = (g ** b) % p;
+    let key = (B ** a) % p;
+
+    document.getElementById("dResult").innerHTML =
+        "Public A: " + A + "<br>" +
+        "Public B: " + B + "<br>" +
+        "Shared Key: " + key;
+}
+
+</script>
+
+</body>
+</html>
