@@ -42,6 +42,5 @@ Shared Key = 2
 - CSS
 - JavaScript
 
-## Live Demo
-## 🚀 Live Demo
-[Click here to view the website](file:///C:/Users/moham/Desktop/2771%20cns%20asg/index.html)
+## Output
+<img width="1917" height="1019" alt="{F19B151F-4530-4CAF-BD94-A10F7DEFDACE}" src="https://github.com/user-attachments/assets/8f5345bd-90a4-4351-8f8b-6b01d56e60a4" />
